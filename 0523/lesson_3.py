@@ -6,6 +6,8 @@ secret_number = random.randint(1, 10)
 
 count = 0
 
+print("歡迎參加猜數字遊戲!")
+
 while True: # 無限迴圈
     guess = int(input("請猜一個1到10的數字: "))
     count += 1
