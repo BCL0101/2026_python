@@ -1,185 +1,132 @@
-export default function NumberGuessGame() {
-  const React = require('react');
-  const { useState, useEffect } = React;
-  const { motion, AnimatePresence } = require('framer-motion');
-  const { RefreshCw, Trophy, Hash, Sparkles } = require('lucide-react');
+import tkinter as tk
+from tkinter import ttk, messagebox
+import random
 
-  const generateNumber = () => Math.floor(Math.random() * 100) + 1;
+class GuessNumberGame:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("猜數字遊戲")
+        self.root.geometry("420x560")
+        self.root.minsize(380, 520)
+        self.root.configure(bg="#f5f7fb")
+        self.root.resizable(False, False)
 
-  const [target, setTarget] = useState(generateNumber());
-  const [guess, setGuess] = useState('');
-  const [message, setMessage] = useState('輸入 1 ~ 100 的數字開始挑戰');
-  const [attempts, setAttempts] = useState(0);
-  const [history, setHistory] = useState([]);
-  const [won, setWon] = useState(false);
-  const [bestScore, setBestScore] = useState(null);
+        self.target = 0
+        self.attempts = 0
+        self.low = 1
+        self.high = 100
 
-  useEffect(() => {
-    const saved = localStorage.getItem('bestScore');
-    if (saved) setBestScore(Number(saved));
-  }, []);
+        self._style()
+        self._build_ui()
+        self.new_game()
 
-  const handleGuess = () => {
-    const num = Number(guess);
+    def _style(self):
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("TFrame", background="#f5f7fb")
+        style.configure("Card.TFrame", background="#ffffff")
+        style.configure("Title.TLabel", background="#f5f7fb", foreground="#1f2937", font=("Helvetica", 22, "bold"))
+        style.configure("Sub.TLabel", background="#f5f7fb", foreground="#6b7280", font=("Helvetica", 10))
+        style.configure("Info.TLabel", background="#ffffff", foreground="#374151", font=("Helvetica", 12))
+        style.configure("Hint.TLabel", background="#ffffff", foreground="#2563eb", font=("Helvetica", 14, "bold"))
+        style.configure("Count.TLabel", background="#ffffff", foreground="#6b7280", font=("Helvetica", 10))
+        style.configure("TEntry", padding=8, font=("Helvetica", 14))
+        style.configure("Accent.TButton", font=("Helvetica", 11, "bold"), padding=(12, 10), background="#2563eb", foreground="#ffffff")
+        style.map("Accent.TButton", background=[("active", "#1d4ed8")])
+        style.configure("Ghost.TButton", font=("Helvetica", 10), padding=(10, 8), background="#e5e7eb", foreground="#111827")
+        style.map("Ghost.TButton", background=[("active", "#d1d5db")])
+        style.configure("TProgressbar", troughcolor="#e5e7eb", background="#2563eb", thickness=12)
 
-    if (!num || num < 1 || num > 100) {
-      setMessage('請輸入有效數字（1~100）');
-      return;
-    }
+    def _build_ui(self):
+        outer = ttk.Frame(self.root)
+        outer.pack(fill="both", expand=True, padx=18, pady=18)
 
-    const newAttempts = attempts + 1;
-    setAttempts(newAttempts);
-    setHistory([{ value: num }, ...history]);
+        header = ttk.Frame(outer)
+        header.pack(fill="x", pady=(6, 14))
+        ttk.Label(header, text="猜數字", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(header, text="在 1 到 100 之間猜出正確答案", style="Sub.TLabel").pack(anchor="w", pady=(4, 0))
 
-    if (num === target) {
-      setWon(true);
-      setMessage(`恭喜答對！答案就是 ${target}`);
+        card = ttk.Frame(outer, style="Card.TFrame")
+        card.pack(fill="both", expand=True)
+        card.configure(padding=18)
 
-      if (!bestScore || newAttempts < bestScore) {
-        setBestScore(newAttempts);
-        localStorage.setItem('bestScore', newAttempts.toString());
-      }
-    } else if (num < target) {
-      setMessage('太小了，再大一點 ↑');
-    } else {
-      setMessage('太大了，再小一點 ↓');
-    }
+        self.status_label = ttk.Label(card, text="請輸入一個數字開始遊戲", style="Info.TLabel", wraplength=340, justify="center")
+        self.status_label.pack(fill="x", pady=(6, 14))
 
-    setGuess('');
-  };
+        self.range_label = ttk.Label(card, text="目前範圍：1 - 100", style="Info.TLabel", anchor="center")
+        self.range_label.pack(fill="x", pady=(0, 10))
 
-  const resetGame = () => {
-    setTarget(generateNumber());
-    setGuess('');
-    setMessage('新的遊戲開始！');
-    setAttempts(0);
-    setHistory([]);
-    setWon(false);
-  };
+        self.entry = ttk.Entry(card, justify="center")
+        self.entry.pack(fill="x", pady=(6, 10))
+        self.entry.bind("<Return>", lambda e: self.check_guess())
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 flex items-center justify-center p-6 text-white overflow-hidden relative">
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-500 rounded-full blur-3xl" />
-      </div>
+        btn_row = ttk.Frame(card)
+        btn_row.pack(fill="x", pady=(4, 10))
+        ttk.Button(btn_row, text="送出", style="Accent.TButton", command=self.check_guess).pack(side="left", expand=True, fill="x", padx=(0, 6))
+        ttk.Button(btn_row, text="重新開始", style="Ghost.TButton", command=self.new_game).pack(side="left", expand=True, fill="x", padx=(6, 0))
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative backdrop-blur-xl bg-white/10 border border-white/15 rounded-3xl shadow-2xl w-full max-w-lg p-8"
-      >
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
-              <Sparkles className="text-cyan-400" />
-              猜數字
-            </h1>
-            <p className="text-slate-300 mt-2">挑戰你的直覺與運氣</p>
-          </div>
+        self.hint_label = ttk.Label(card, text="", style="Hint.TLabel", anchor="center", justify="center", wraplength=320)
+        self.hint_label.pack(fill="x", pady=(12, 8))
 
-          <button
-            onClick={resetGame}
-            className="bg-white/10 hover:bg-white/20 transition p-3 rounded-2xl border border-white/10"
-          >
-            <RefreshCw size={20} />
-          </button>
-        </div>
+        self.progress = ttk.Progressbar(card, maximum=10, mode="determinate")
+        self.progress.pack(fill="x", pady=(10, 6))
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-black/20 rounded-2xl p-4 border border-white/10">
-            <div className="text-slate-400 text-sm mb-1">嘗試次數</div>
-            <div className="text-3xl font-bold flex items-center gap-2">
-              <Hash className="text-cyan-400" />
-              {attempts}
-            </div>
-          </div>
+        self.count_label = ttk.Label(card, text="已猜次數：0", style="Count.TLabel", anchor="center")
+        self.count_label.pack(fill="x", pady=(4, 0))
 
-          <div className="bg-black/20 rounded-2xl p-4 border border-white/10">
-            <div className="text-slate-400 text-sm mb-1">最佳紀錄</div>
-            <div className="text-3xl font-bold flex items-center gap-2">
-              <Trophy className="text-yellow-400" />
-              {bestScore || '--'}
-            </div>
-          </div>
-        </div>
+        tip = ttk.Label(outer, text="小提示：答對後可以直接按重新開始再玩一次。", style="Sub.TLabel")
+        tip.pack(pady=(12, 0))
 
-        <motion.div
-          key={message}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/20 rounded-2xl p-5 text-center mb-6"
-        >
-          <p className="text-lg font-medium">{message}</p>
-        </motion.div>
+    def new_game(self):
+        self.target = random.randint(1, 100)
+        self.attempts = 0
+        self.low = 1
+        self.high = 100
+        self.entry.delete(0, tk.END)
+        self.entry.config(state="normal")
+        self.status_label.config(text="新遊戲已開始，請輸入 1 到 100 的數字")
+        self.range_label.config(text="目前範圍：1 - 100")
+        self.hint_label.config(text="")
+        self.count_label.config(text="已猜次數：0")
+        self.progress["value"] = 0
+        self.entry.focus_set()
 
-        {!won && (
-          <div className="flex gap-3 mb-8">
-            <input
-              type="number"
-              value={guess}
-              onChange={(e) => setGuess(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleGuess()}
-              placeholder="輸入數字"
-              className="flex-1 bg-white/10 border border-white/15 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-cyan-400 text-lg"
-            />
+    def check_guess(self):
+        value = self.entry.get().strip()
+        if not value.isdigit():
+            messagebox.showwarning("輸入錯誤", "請輸入整數數字。")
+            return
 
-            <button
-              onClick={handleGuess}
-              className="px-6 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 font-bold hover:scale-105 active:scale-95 transition"
-            >
-              猜！
-            </button>
-          </div>
-        )}
+        guess = int(value)
+        if guess < 1 or guess > 100:
+            messagebox.showwarning("超出範圍", "請輸入 1 到 100 之間的數字。")
+            return
 
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">猜測紀錄</h2>
-            <span className="text-sm text-slate-400">
-              最近 {history.length} 次
-            </span>
-          </div>
+        self.attempts += 1
+        self.count_label.config(text=f"已猜次數：{self.attempts}")
+        self.progress["value"] = min(self.attempts, 10)
 
-          <div className="flex flex-wrap gap-3 min-h-[60px]">
-            <AnimatePresence>
-              {history.map((item, index) => (
-                <motion.div
-                  key={`${item.value}-${index}`}
-                  initial={{ opacity: 0, scale: 0.7, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 backdrop-blur-md font-semibold"
-                >
-                  {item.value}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
+        if guess < self.target:
+            self.low = max(self.low, guess + 1)
+            self.status_label.config(text="再大一點！")
+            self.hint_label.config(text=f"提示：答案在 {self.low} 到 {self.high} 之間")
+        elif guess > self.target:
+            self.high = min(self.high, guess - 1)
+            self.status_label.config(text="再小一點！")
+            self.hint_label.config(text=f"提示：答案在 {self.low} 到 {self.high} 之間")
+        else:
+            self.status_label.config(text="恭喜你猜中了！")
+            self.hint_label.config(text=f"正確答案是 {self.target}，你總共猜了 {self.attempts} 次")
+            messagebox.showinfo("完成", f"答對了！答案是 {self.target}，共猜了 {self.attempts} 次。")
+            self.entry.delete(0, tk.END)
+            self.entry.config(state="disabled")
+            return
 
-        {won && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-8 text-center bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-400/20 rounded-3xl p-6"
-          >
-            <div className="text-5xl mb-3">🎉</div>
-            <h3 className="text-2xl font-black mb-2">你贏了！</h3>
-            <p className="text-slate-300 mb-5">
-              你總共用了 {attempts} 次猜中答案
-            </p>
+        self.entry.delete(0, tk.END)
+        self.entry.focus_set()
+        self.range_label.config(text=f"目前範圍：{self.low} - {self.high}")
 
-            <button
-              onClick={resetGame}
-              className="px-6 py-3 rounded-2xl bg-white text-slate-900 font-bold hover:scale-105 active:scale-95 transition"
-            >
-              再玩一次
-            </button>
-          </motion.div>
-        )}
-      </motion.div>
-    </div>
-  );
-}
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = GuessNumberGame(root)
+    root.mainloop()
