@@ -17,5 +17,6 @@ import csv
 
 with open("考試分數_3年6班.csv", "r", encoding="utf-8") as file:
     reader = csv.DictReader(file)
-    for row in reader:
-        print(row)
+    # print(type(reader))
+    for row in reader:   # for 自訂的變數 in reader:
+        print(row)   # dict儲存在row
