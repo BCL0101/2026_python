@@ -26,3 +26,9 @@ https://www.youtube.com/watch?v=FCF8bax8pkc
 https://www.youtube.com/watch?v=o9rvAkv8ljk
 
 ---------------------------------------------
+# 2026_06_06_上午課程連結
+https://www.youtube.com/watch?v=liCGUFj2qyQ
+
+# 2026_06_06_下午課程連結
+https://www.youtube.com/watch?v=
+
