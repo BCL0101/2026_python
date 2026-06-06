@@ -30,5 +30,5 @@ https://www.youtube.com/watch?v=o9rvAkv8ljk
 https://www.youtube.com/watch?v=liCGUFj2qyQ
 
 # 2026_06_06_下午課程連結
-https://www.youtube.com/watch?v=
+https://www.youtube.com/watch?v=OXX6GATTqTY
 
