@@ -1,4 +1,4 @@
-def main():
+def main():   #自定義function
     print("這裡是main function的命名空間")
     print(n)
     
