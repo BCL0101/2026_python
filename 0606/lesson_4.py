@@ -98,7 +98,7 @@ def main():
         # list[dict] -> DataFrame
         df:DataFrame = pd.DataFrame(data=data)
 
-        print(df.head(5))
+        print(df.head(5))   #print(df.tail())
 
         output_file = Path(__file__).with_name("youbike_report.pdf")
         export_to_pdf(df, output_file)
