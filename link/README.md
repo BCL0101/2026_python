@@ -44,4 +44,7 @@ https://www.youtube.com/live/pPNPDGTg5XY
 # 2026_06_27_上午課程連結
 https://www.youtube.com/watch?v=V-78xARVSig
 
+# 2026_06_27_下午課程連結
+https://www.youtube.com/watch?v=hzTcwBLsypc
 
+---------------------------------------------
