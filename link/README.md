@@ -52,4 +52,9 @@ https://www.youtube.com/watch?v=hzTcwBLsypc
 # 2026_07_04_上午課程連結
 https://www.youtube.com/watch?v=YlV_waBSuMk
 
+# 2026_07_04_下午課程連結
+https://www.youtube.com/watch?v=jQNJ9nSRPnE
+
+---------------------------------------------
+
 
