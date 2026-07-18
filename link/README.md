@@ -61,4 +61,4 @@ https://www.youtube.com/watch?v=jQNJ9nSRPnE
 https://www.youtube.com/watch?v=-mIjCyINGcw
 
 # 2026_07_18_下午課程連結
-https://www.youtube.com/watch?v=
+https://www.youtube.com/watch?v=nGJs78vzE84
