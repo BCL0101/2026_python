@@ -57,4 +57,8 @@ https://www.youtube.com/watch?v=jQNJ9nSRPnE
 
 ---------------------------------------------
 
+# 2026_07_18_上午課程連結
+https://www.youtube.com/watch?v=-mIjCyINGcw
 
+# 2026_07_18_下午課程連結
+https://www.youtube.com/watch?v=
